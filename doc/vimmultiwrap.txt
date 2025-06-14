@@ -1,0 +1,13 @@
+Ввод в командной строке	    Результат
+
+p                           <p>текст</p>
+
+p#main.red strong.green a   <p id="main" class="red"><strong class="green"><a href="">text</a></strong></p>
+span.title	                <span class="title">текст</span>
+
+> a                         каждая линия
+                            <a href="">text</a>
+
+> a_blank.red               каждая линия
+                            <a href="" target="_blank" rel="nofollow">text</a>
+
