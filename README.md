@@ -15,7 +15,9 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Result**
 
-`<p>text</p>`
+```HTML
+<p>text</p>
+```
 
 -----------------------
 
@@ -31,7 +33,9 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Result**
 
-`<p class="red">text</p>`
+```HTML
+`<p class="red">text</p>
+```
 
 -----------------------
 **Text for layout**
