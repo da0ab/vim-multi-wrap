@@ -5,25 +5,25 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Text for layout**
 
-``
+```HTML
  text
-``
+```
 
-**Command Line Input** ``p``
+**Command Line Input** `p`
 
 **Result**
 
-``<p>text</p>``
+`<p>text</p>`
 
 -----------------------
 
 **Text for layout**
 
-``
+```HTML
  text
-``
+```
 
-**Command Line Input**  ``p.red``
+**Command Line Input**  `p.red`
 
 **Result**
 
@@ -32,23 +32,22 @@ A plugin for quickly wrapping multiple lines in HTML tags
 -----------------------
 **Text for layout**
 
-`
+```HTML
  text
 
  text2
 
  text3
-`
+```
 
-**Command Line Input**  ``> p.red``
+**Command Line Input**  `> p.red`
 
 **Result**
 
-Html
-``
+```HTML
 <p class="red">text</p>
 
 <p class="red">text2</p>
 
 <p class="red">text3</p>
-``
+```
