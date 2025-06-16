@@ -3,6 +3,8 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Hotkey leder-w**
 
+**Text for layout**
+
 ``
  text
 ``
@@ -15,7 +17,7 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 -----------------------
 
-**Hotkey leder-w**
+**Text for layout**
 
 ``
  text
@@ -28,7 +30,7 @@ A plugin for quickly wrapping multiple lines in HTML tags
 ``<p class="red">text</p>``
 
 -----------------------
-**Hotkey leder-w**
+**Text for layout**
 
 ``
  text
@@ -42,6 +44,7 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Result**
 
+Html
 ``
 <p class="red">text</p>
 
