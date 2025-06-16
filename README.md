@@ -27,18 +27,18 @@ A plugin for quickly wrapping multiple lines in HTML tags
 
 **Result**
 
-``<p class="red">text</p>``
+`<p class="red">text</p>`
 
 -----------------------
 **Text for layout**
 
-``
+`
  text
 
  text2
 
  text3
-``
+`
 
 **Command Line Input**  ``> p.red``
 
