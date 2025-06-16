@@ -6,9 +6,8 @@ A plugin for quickly wrapping multiple lines in HTML tags
 ``
  text
 ``
-**Command Line Input**
 
-`` p``
+**Command Line Input** ``p``
 
 **Result**
 
@@ -21,9 +20,8 @@ A plugin for quickly wrapping multiple lines in HTML tags
 ``
  text
 ``
-**Command Line Input**
 
-`` p.red``
+**Command Line Input**  ``p.red``
 
 **Result**
 
@@ -40,9 +38,7 @@ A plugin for quickly wrapping multiple lines in HTML tags
  text3
 ``
 
-**Command Line Input**
-
-`` > p.red``
+**Command Line Input**  ``> p.red``
 
 **Result**
 
