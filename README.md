@@ -1,14 +1,39 @@
 # vim-multi-wrap
 A plugin for quickly wrapping multiple lines in HTML tags
 
-| Command Line Input            | Result
+| Hotkey leder-w
+``
+ text
+``
+| Command Line Input
+`` p``
+| Result
+``<p>text</p>``
+-----------------------
+| Hotkey leder-w
+``
+ text
+``
+| Command Line Input
+`` p.red``
+| Result
+``<p class="red">text</p>``
+-----------------------
+| Hotkey leder-w
+``
+ text
 
-| p                             | <p>text</p>
-| p#main.red strong.green a     | <p id="main" class="red"><strong class="green">
-|                               | <a href="">text</a></strong></p>
-|                               |
-| > a                           | each line
-|                               | <a href="">text</a>
-|                               |
-| > a_blank.red                 | each line
-|                               | <a href="" target="_blank" rel="nofollow">text</a>
+ text2
+
+ text3
+``
+| Command Line Input
+`` > p.red``
+| Result
+``
+<p class="red">text</p>
+
+<p class="red">text2</p>
+
+<p class="red">text3</p>
+``

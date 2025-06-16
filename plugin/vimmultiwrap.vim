@@ -1,11 +1,10 @@
-" plugin/wrap_tag.vim
 if exists('g:loaded_wrap_tag') || &cp
   finish
 endif
 let g:loaded_wrap_tag = 1
 
 function! s:WrapWithTag(type) abort
-  let l:raw_input = input('Tag (> для построчной обёртки): ')
+  let l:raw_input = input('tag или > tag): ')
   if empty(l:raw_input)
     return
   endif
@@ -14,66 +13,33 @@ function! s:WrapWithTag(type) abort
   let l:parts = split(l:raw_input)
 
   let l:is_line_wrap = (get(l:parts, 0, '') ==# '>')
-  let l:tags_str = l:is_line_wrap ? join(l:parts[1:], ' ') : join(l:parts, ' ')
-  if empty(l:tags_str)
+  let l:tag_part = l:is_line_wrap ? get(l:parts, 1, '') : get(l:parts, 0, '')
+
+  if l:tag_part =~ '\.'
+    let [l:tag, l:class] = split(l:tag_part, '\.', 1)
+  else
+    let l:tag = l:tag_part
+    let l:class = ''
+  endif
+
+  if empty(l:tag)
     echo '❌ Не указан тег'
     return
   endif
 
-  " Разбор вложенных тегов
-  let l:tag_defs = split(l:tags_str)
-  let l:open_tags = []
-  let l:close_tags = []
+  let l:class_str = l:class !=# '' ? ' class="'.l:class.'"' : ''
+  let l:open_tag = '<'.l:tag.l:class_str.'>'
+  let l:close_tag = '</'.l:tag.'>'
 
-  for def in l:tag_defs
-    let tag = ''
-    let id = ''
-    let class = ''
-    let attr = ''
-
-    let is_a_blank = def =~# '^a_blank'
-
-    if is_a_blank
-      let tag = 'a'
-      let rest = substitute(def, '^a_blank', '', '')
-      if rest =~# '\.'
-        let class = matchstr(rest, '\.\zs.*')
-      endif
-      let attr .= ' href="" target="_blank" rel="nofollow"'
-    else
-      let tag = matchstr(def, '^[^#.\s]\+')
-      let id = matchstr(def, '#\zs[^.]*')
-      let class = matchstr(def, '\.\zs.*')
-
-      if tag ==# 'a'
-        let attr .= ' href=""'
-      endif
-      if id !=# ''
-        let attr .= ' id="'.id.'"'
-      endif
-      if class !=# ''
-        let attr .= ' class="'.class.'"'
-      endif
-    endif
-
-
-    call add(l:open_tags, '<'.tag.attr.'>')
-    call insert(l:close_tags, '</'.tag.'>')
-  endfor
-
-  let l:open_str = join(l:open_tags, '')
-  let l:close_str = join(l:close_tags, '')
-
-  " === Далее остальная часть без изменений ===
   if a:type ==# 'v'
     let [line1, col1] = getpos("'<")[1:2]
     let [line2, col2] = getpos("'>")[1:2]
 
     if line1 != line2
       let l:lines = getline(line1, line2)
-      let l:lines[0] = l:lines[0][col1-1 :]
-      let l:lines[-1] = l:lines[-1][: col2-1]
-      let l:wrapped = [l:open_str] + l:lines + [l:close_str]
+      let l:lines[0] = l:lines[0][col1 - 1 :]
+      let l:lines[-1] = l:lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 0)]
+      let l:wrapped = [l:open_tag] + l:lines + [l:close_tag]
       call setline(line1, l:wrapped)
       if line2 > line1 + len(l:wrapped) - 1
         execute (line1 + len(l:wrapped)) . ',' . line2 . 'delete _'
@@ -89,30 +55,18 @@ function! s:WrapWithTag(type) abort
     let l:start = col1 - 1
     let l:end = col2 - 1
 
-    while l:start > 0 && l:line[l:start] =~ '[\x80-\xBF]'
+    while l:start > 0 && l:line[l:start] =~# '[\x80-\xBF]'
       let l:start -= 1
     endwhile
-    while l:end < strlen(l:line) - 1 && l:line[l:end + 1] =~ '[\x80-\xBF]'
+    while l:end < strlen(l:line) - 1 && l:line[l:end + 1] =~# '[\x80-\xBF]'
       let l:end += 1
     endwhile
 
-    let l:has_trailing_space = 0
-    if l:end < strlen(l:line) - 1 && l:line[l:end + 1] ==# ' '
-      let l:has_trailing_space = 1
-    endif
+    let l:selected = strcharpart(l:line, l:start, strchars(strpart(l:line, l:start, l:end - l:start + 1)))
+    let l:before = strpart(l:line, 0, l:start)
+    let l:after = strpart(l:line, l:end + 1)
 
-    if l:line[l:end] ==# ' '
-      let l:end -= 1
-      let l:has_trailing_space = 1
-    endif
-
-    let l:newline = strpart(l:line, 0, l:start) .
-          \ l:open_str .
-          \ strpart(l:line, l:start, l:end - l:start + 1) .
-          \ l:close_str .
-          \ (l:has_trailing_space ? ' ' : '') .
-          \ strpart(l:line, l:end + 1 + (l:has_trailing_space ? 1 : 0))
-
+    let l:newline = l:before . l:open_tag . l:selected . l:close_tag . l:after
     call setline(line1, l:newline)
 
   elseif a:type ==# 'V'
@@ -120,16 +74,37 @@ function! s:WrapWithTag(type) abort
     let l:end = line("'>")
 
     if l:is_line_wrap
-      for lnum in range(l:start, l:end)
+      let l:block = []
+      let l:new_lines = []
+
+      for lnum in range(l:start, l:end + 1)
         let l:line = getline(lnum)
         if l:line =~ '^\s*$'
-          continue
+          if !empty(l:block)
+            call add(l:new_lines, l:open_tag)
+            call extend(l:new_lines, l:block)
+            call add(l:new_lines, l:close_tag)
+            let l:block = []
+          endif
+          call add(l:new_lines, l:line)
+        else
+          call add(l:block, l:line)
         endif
-        call setline(lnum, l:open_str . l:line . l:close_str)
       endfor
+
+      if !empty(l:block)
+        call add(l:new_lines, l:open_tag)
+        call extend(l:new_lines, l:block)
+        call add(l:new_lines, l:close_tag)
+      endif
+
+      call setline(l:start, l:new_lines)
+      if l:end > l:start + len(l:new_lines) - 1
+        execute (l:start + len(l:new_lines)) . ',' . l:end . 'delete _'
+      endif
     else
       let l:lines = getline(l:start, l:end)
-      let l:wrapped = [l:open_str] + l:lines + [l:close_str]
+      let l:wrapped = [l:open_tag] + l:lines + [l:close_tag]
       call setline(l:start, l:wrapped)
       if l:end > l:start + len(l:wrapped) - 1
         execute (l:start + len(l:wrapped)) . ',' . l:end . 'delete _'
@@ -138,10 +113,9 @@ function! s:WrapWithTag(type) abort
 
   else
     let l:line = getline('.')
-    call setline('.', l:open_str . l:line . l:close_str)
+    call setline('.', l:open_tag . l:line . l:close_tag)
   endif
 endfunction
-
 
 " Маппинги через <Plug> для лучшей совместимости
 nnoremap <silent> <Plug>WrapTag :call <SID>WrapWithTag('n')<CR>
